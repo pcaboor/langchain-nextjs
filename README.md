@@ -1,237 +1,350 @@
-# Documentation Technique : Conotion
+# Documentation Technique : Application Next.js avec GraphQL et Shadcn UI
 
-**Une plateforme d'aide à la documentation logicielle alimentée par l'IA.**
-
-🚀  Bienvenue à la documentation de Conotion ! Ce document fournit une vue d'ensemble complète du projet, son architecture, sa configuration, son utilisation et sa maintenance.
+👋 Bienvenue dans la documentation de notre application Next.js. Ce document détaille l'architecture, la configuration, l'utilisation et la maintenance de l'application.
 
 ## Table des Matières
 
 1. [Vue d'ensemble du projet](#1-vue-densemble-du-projet)
-2. [Architecture Technique](#2-architecture-technique)
-    * [Diagramme d'Architecture](#diagramme-darchitecture)
-    * [Composants Principaux](#composants-principaux)
-    * [Modèles de Conception](#modèles-de-conception)
-3. [Dépendances et Prérequis](#3-dépendances-et-prérequis)
-4. [Instructions de Configuration](#4-instructions-de-configuration)
-    * [Installation des Dépendances](#installation-des-dépendances)
-    * [Configuration de la Base de Données](#configuration-de-la-base-de-données)
-    * [Configuration des Variables d'Environnement](#configuration-des-variables-denvironnement)
-5. [Documentation de l'API](#5-documentation-de-lapi)
-    * [API tRPC](#api-trpc)
-    * [Exemple d'utilisation de l'API](#exemple-dutilisation-de-lapi)
-6. [Cas d'Utilisation Courants](#6-cas-dutilisation-courants)
-7. [Guide de Dépannage](#7-guide-de-dépannage)
-8. [Considérations de Sécurité](#8-considérations-de-sécurité)
-9. [Optimisations de Performance](#9-optimisations-de-performance)
-10. [Lignes Directrices pour les Tests](#10-lignes-directrices-pour-les-tests)
-11. [Processus de Déploiement](#11-processus-de-déploiement)
-12. [Procédures de Maintenance](#12-procédures-de-maintenance)
-    * [Mises à jour](#mises-à-jour)
-    * [Surveillance](#surveillance)
-    * [Évolutivité](#évolutivité)
-    * [Sauvegardes et Récupération](#sauvegardes-et-récupération)
-13. [Informations de Contact et Contributions](#13-informations-de-contact-et-contributions)
+2. [Architecture technique](#2-architecture-technique)
+3. [Instructions de configuration](#3-instructions-de-configuration)
+    * [Prérequis](#31-prerequis)
+    * [Installation des dépendances](#32-installation-des-dependances)
+    * [Lancement de l'application](#33-lancement-de-lapplication)
+4. [Dépendances et prérequis](#4-dependances-et-prerequis)
+5. [Configuration](#5-configuration)
+    * [Configuration Next.js (`next.config.ts`)](#51-configuration-nextjs-nextconfigts)
+    * [Configuration Tailwind CSS (`tailwind.config.ts`)](#52-configuration-tailwind-css-tailwindconfigts)
+    * [Configuration ESLint (`eslint.config.mjs`)](#53-configuration-eslint-eslintconfigmjs)
+    * [Configuration PostCSS (`postcss.config.mjs`)](#54-configuration-postcss-postcssconfigmjs)
+    * [Configuration TypeScript (`tsconfig.json`)](#55-configuration-typescript-tsconfigjson)
+    * [Configuration Shadcn UI (`components.json`)](#56-configuration-shadcn-ui-componentsjson)
+6. [Documentation de l'API (GraphQL)](#6-documentation-de-lapi-graphql)
+7. [Cas d'utilisation courants](#7-cas-dutilisation-courants)
+8. [Guide de dépannage](#8-guide-de-depannage)
+9. [Considérations de sécurité](#9-considerations-de-securite)
+10. [Optimisations de performance](#10-optimisations-de-performance)
+11. [Lignes directrices pour les tests](#11-lignes-directrices-pour-les-tests)
+12. [Processus de déploiement](#12-processus-de-deploiement)
+13. [Procédures de maintenance](#13-procedures-de-maintenance)
+14. [Informations de contact et contributions](#14-informations-de-contact-et-contributions)
 
 
 ## 1. Vue d'ensemble du projet
 
-Conotion est une plateforme innovante d'aide à la documentation logicielle.  Elle utilise l'intelligence artificielle pour générer automatiquement de la documentation technique à partir de votre code source, que ce soit depuis un dépôt GitHub ou des fichiers locaux.  Conotion vise à simplifier et accélérer la création de documentation, améliorant ainsi la collaboration et la maintenance des projets logiciels.  Elle intègre des fonctionnalités de recherche sémantique basées sur des embeddings pour faciliter l'accès aux informations pertinentes.
+Ce projet est une application web développée avec Next.js, utilisant GraphQL comme couche d'API et Shadcn UI pour l'interface utilisateur.  L'application fournit un tableau de bord personnalisé pour les utilisateurs, affichant des informations sur leur progression, leurs projets, et leurs audits.  Elle est conçue pour être scalable, performante et sécurisée.
 
 
-## 2. Architecture Technique
+## 2. Architecture technique
 
-Conotion utilise une architecture microservices distribuée, combinant des composants frontend et backend.
-
-### Diagramme d'Architecture
+L'application suit une architecture client-serveur, avec une API GraphQL côté serveur et une interface utilisateur Next.js côté client.
 
 ```mermaid
 graph LR
-    A[Interface Utilisateur Next.js] --> B(API tRPC);
-    B --> C[Service de Question-Réponse Node.js];
-    C --> D{Ollama/Gemini};
-    C --> E[Base de données PostgreSQL];
-    E --> F[Migrations Prisma];
-    A --> G[Authentification Clerk.js];
-    C --> H[Service GitHub];
-    H --> I[API GitHub];
-    C --> J[Service de Génération d'Embeddings Nomic];
-    
-    subgraph "Composants Frontend"
-        A
-        G
+    subgraph Client
+        A[Next.js Application] --> B(React Components);
+        B --> C(Shadcn UI);
+        B --> D(Lucide Icons);
+        B --> E(Recharts);
     end
-    subgraph "Composants Backend"
-        B
-        C
-        D
-        E
-        F
-        H
-        I
-        J
+    subgraph Server
+        F[GraphQL API] --> G(PostgreSQL Database);
+        F --> H(Authentication Service);
     end
-
+    A --> F;
 ```
 
-### Composants Principaux
+**Modèle de conception:** L'application utilise le pattern **Model-View-Controller (MVC)** pour séparer les préoccupations.  Next.js gère le routing et le rendu, les composants React constituent la vue, et les services et le code d'API gèrent le modèle et le contrôleur.  L'utilisation de Context API en React permet une gestion efficace de l'état global.
 
-* **Frontend (Next.js):**  L'interface utilisateur, construite avec Next.js, React, et des bibliothèques UI comme Radix UI et Shadcn UI.  Elle offre une expérience utilisateur intuitive pour la création de projets, la pose de questions et la consultation de la documentation.
-* **Backend (Next.js API Routes):**  Héberge l'API tRPC, gérant les requêtes et interactions avec la base de données et les services externes.
-* **API tRPC:** Une API type-safe utilisant tRPC pour une communication efficace et sécurisée entre le frontend et le backend.
-* **Base de données (PostgreSQL):**  Stockage persistant des données utilisateur, des projets, du code source, des embeddings, et de la documentation générée.  Prisma est utilisé comme ORM.
-* **Services externes:**
-    * **Ollama/Gemini API:**  Pour l'interaction avec des modèles de langage large (LLMs) afin de générer des résumés de code et de répondre aux questions.
-    * **GitHub API (Octokit):** Pour l'intégration avec les dépôts GitHub, permettant l'importation de code et la surveillance des commits.
-    * **Stripe API:**  Pour le traitement des paiements et la gestion des abonnements.
-    * **Nomic Embeddings API:** Pour la génération d'embeddings pour la recherche sémantique.
+**Décisions architecturales:**
 
-### Modèles de Conception
-
-* **Microservices:**  Le backend est découplé en services indépendants pour une meilleure maintenabilité et évolutivité.
-* **Type-Safety (TypeScript et tRPC):**  L'utilisation de TypeScript et tRPC améliore la robustesse et réduit les erreurs.
-* **Singleton Pattern (Prisma Client):**  Une seule instance du client Prisma est utilisée pour optimiser les performances de la base de données.
+* **Next.js:** Choisi pour ses performances de rendu, son routage et sa facilité d'intégration avec React.
+* **GraphQL:**  Utilise pour une gestion efficace des données et une meilleure performance des requêtes.
+* **Shadcn UI:**  Intégration d'une librairie UI pour accélérer le développement et maintenir une cohérence visuelle.
+* **Tailwind CSS:** Utilise pour un style rapide et efficace.
+* **TypeScript:**  Implémenté pour la sécurité de typage et l'amélioration de la maintenabilité du code.
 
 
-## 3. Dépendances et Prérequis
+## 3. Instructions de configuration
 
-* Node.js (v16 ou supérieur)
-* npm ou yarn
-* PostgreSQL (avec les extensions `pg_trgm` et `vector`)
-* Un compte Stripe (pour la gestion des paiements)
-* Une clé API Ollama/Gemini
-* Une clé API Nomic
+### 3.1 Prérequis
 
+* Node.js et npm (ou yarn, pnpm, bun) installés.
+* Un éditeur de code (VS Code recommandé).
+* Git installé (pour le clonage du dépôt).
 
-## 4. Instructions de Configuration
+### 3.2 Installation des dépendances
 
-### Installation des Dépendances
+Après avoir cloné le dépôt, naviguez vers le répertoire du projet et exécutez la commande suivante :
 
 ```bash
 npm install
-# ou
+```
+
+ou
+
+```bash
 yarn install
 ```
 
-### Configuration de la Base de Données
+ou
 
-Créez une base de données PostgreSQL et configurez les variables d'environnement (voir ci-dessous).  Assurez-vous que les extensions `pg_trgm` et `vector` sont installées.
-
-### Configuration des Variables d'Environnement
-
-Copiez le fichier `.env.example` en `.env` et renseignez les valeurs appropriées:
-
+```bash
+pnpm install
 ```
-DATABASE_URL=postgres://user:password@host:port/database
-STRIPE_SECRET_KEY=YOUR_STRIPE_SECRET_KEY
-OLLAMA_API_KEY=YOUR_OLLAMA_API_KEY
-NOMIC_API_KEY=YOUR_NOMIC_API_KEY
-GITHUB_TOKEN=YOUR_GITHUB_TOKEN # Facultatif, pour l'intégration GitHub
-NEXTAUTH_URL=http://localhost:3000  # ou votre URL de déploiement
+
+ou
+
+```bash
+bun install
 ```
 
 
-## 5. Documentation de l'API
+### 3.3 Lancement de l'application
 
-Conotion utilise principalement une API tRPC pour la communication entre le frontend et le backend.
+Pour lancer l'application en mode développement, exécutez :
 
-### API tRPC
+```bash
+npm run dev
+# or yarn dev
+# or pnpm dev
+# or bun dev
+```
 
-L'API tRPC expose plusieurs procédures pour gérer les utilisateurs, les projets, la documentation et les questions.  Voici quelques exemples:
-
-* `/api/trpc/project.createProject`: Crée un nouveau projet.
-* `/api/trpc/project.getProjectDocumentation`: Récupère la documentation d'un projet.
-* `/api/trpc/user.getUser`: Récupère les informations d'un utilisateur.
-* `/api/trpc/post.create`: Crée un nouveau post.
+L'application sera accessible à l'adresse `http://localhost:3000`.
 
 
-### Exemple d'utilisation de l'API (TypeScript)
+## 4. Dépendances et prérequis
+
+| Nom            | Version    | Description                                      |
+|-----------------|-------------|--------------------------------------------------|
+| Next.js         | (voir `package.json`) | Framework React                                 |
+| React            | (voir `package.json`) | Bibliothèque JavaScript                            |
+| GraphQL         | (voir `package.json`) | Langage de requête                               |
+| Shadcn UI       | (voir `package.json`) | Bibliothèque d'interface utilisateur              |
+| Tailwind CSS     | (voir `package.json`) | Framework CSS                                     |
+| TypeScript       | (voir `package.json`) | Surcouche de JavaScript                           |
+| Recharts         | (voir `package.json`) | Bibliothèque de graphique                         |
+| ...             | ...         | Autres dépendances (voir `package.json`)          |
+
+
+## 5. Configuration
+
+### 5.1 Configuration Next.js (`next.config.ts`)
+
+Ce fichier permet de configurer Next.js.  Actuellement, il est vide, utilisant les paramètres par défaut.  Vous pouvez ajouter des options ici pour personnaliser le comportement de Next.js, par exemple pour l'optimisation des images.
 
 ```typescript
-import { createTRPCReact } from '@trpc/react-query'
-import { AppRouter } from '@/server/api/root'
+// next.config.ts
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  /* config options here */
+}
 
-const trpc = createTRPCReact<AppRouter>()
+module.exports = nextConfig
+```
 
-// Récupérer les informations utilisateur
-const user = trpc.useQuery(['user.getUser'])
+[Documentation Next.js Configuration](https://nextjs.org/docs/api-reference/next.config.js/introduction)
 
-// Créer un nouveau projet
-const createProjectMutation = trpc.useMutation(['project.createProject'])
+
+### 5.2 Configuration Tailwind CSS (`tailwind.config.ts`)
+
+Ce fichier configure Tailwind CSS. Il spécifie les fichiers sources pour le style, active le mode sombre et étend le thème par défaut.
+
+```typescript
+// tailwind.config.ts
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'primary': '#3498db', //Exemple
+        'secondary': '#2ecc71' //Exemple
+      },
+      fontFamily: {
+        'sans': ['IBM Plex Sans', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [require('tailwindcss-animate')],
+}
+
+```
+
+[Documentation Tailwind CSS](https://tailwindcss.com/docs/configuration)
+
+
+### 5.3 Configuration ESLint (`eslint.config.mjs`)
+
+Ce fichier configure ESLint pour vérifier le code et appliquer les meilleures pratiques.
+
+```javascript
+// eslint.config.mjs
+import { FlatCompat } from '@eslint/eslintrc';
+
+const config = new FlatCompat({
+  extends: ['next/core-web-vitals', 'next/typescript'],
+}).config;
+
+export default config;
 ```
 
 
-## 6. Cas d'Utilisation Courants
+### 5.4 Configuration PostCSS (`postcss.config.mjs`)
 
-* **Générer de la documentation à partir d'un dépôt GitHub:**  Indiquez l'URL du dépôt, la branche et Conotion générera la documentation.
-* **Générer de la documentation à partir de fichiers locaux:** Importez vos fichiers et Conotion générera la documentation.
-* **Poser des questions sur votre code:** Posez des questions précises sur votre code et obtenez des réponses détaillées.
-* **Gérer vos projets:** Créez, supprimez, et archivez vos projets.
+Ce fichier configure PostCSS, utilisé avec Tailwind CSS.
 
-
-## 7. Guide de Dépannage
-
-* **Erreur de connexion à la base de données:** Vérifiez les variables d'environnement `DATABASE_URL`.
-* **Limite de requêtes API dépassée:**  Augmentez vos quotas auprès des API externes (Ollama, Gemini, Stripe, Nomic).
-* **Problèmes d'authentification:** Vérifiez vos clés API et vos tokens.
+```javascript
+// postcss.config.mjs
+/** @type {import('postcss').Config} */
+export default {
+  plugins: [tailwindcss(), autoprefixer()],
+}
+```
 
 
-## 8. Considérations de Sécurité
+### 5.5 Configuration TypeScript (`tsconfig.json`)
 
-* **Protection des clés API:**  Ne commettez jamais vos clés API dans votre dépôt Git.  Utilisez des variables d'environnement.
-* **Validation des entrées utilisateur:**  Implémentez une validation robuste des entrées utilisateur pour prévenir les injections SQL et autres vulnérabilités.
-* **Gestion des erreurs:**  Gérez les erreurs correctement et évitez de divulguer des informations sensibles.
+Ce fichier configure le compilateur TypeScript.
 
-
-## 9. Optimisations de Performance
-
-* **Caching:**  Implémentez un mécanisme de caching pour les données fréquemment accédées.
-* **Optimisation des requêtes à la base de données:**  Utilisez des indices et optimisez vos requêtes SQL.
-* **Compression des données:**  Compressez les données avant de les transmettre sur le réseau.
-
-
-## 10. Lignes Directrices pour les Tests
-
-* **Tests unitaires:**  Testez les composants individuels de votre application.
-* **Tests d'intégration:**  Testez l'interaction entre les différents composants.
-* **Tests d'extrémité à extrémité (E2E):**  Testez le flux complet de l'application.
-
-
-## 11. Processus de Déploiement
-
-Conotion peut être déployé sur différentes plateformes cloud (Vercel, Netlify, AWS, etc.).  Utilisez un système de gestion de versions (Git) et un processus de déploiement automatisé (CI/CD).
-
-
-## 12. Procédures de Maintenance
-
-### Mises à jour
-
-Les mises à jour seront gérées via des versions de packages npm et des migrations de base de données Prisma.  Un changelog précisera les changements.
-
-### Surveillance
-
-Utilisez des outils de surveillance pour surveiller les performances de l'application et identifier les problèmes potentiels.
-
-### Évolutivité
-
-L'architecture microservices permet une évolutivité horizontale.  Augmentez le nombre d'instances des services au besoin.
-
-### Sauvegardes et Récupération
-
-Implémentez un système de sauvegarde régulier de la base de données et des fichiers de configuration.  Définissez une procédure de restauration en cas de panne.
-
-### Liste des tâches de maintenance et des calendriers
-
-* **Quotidien:**  Vérification des logs et des performances.
-* **Hebdomadaire:**  Nettoyage de la base de données.
-* **Mensuel:**  Mises à jour des dépendances et des bibliothèques.
-* **Trimestriel:**  Tests de performance et de sécurité.
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
+```
 
 
-## 13. Informations de Contact et Contributions
+### 5.6 Configuration Shadcn UI (`components.json`)
 
-Pour toute question ou suggestion, veuillez contacter:  [votre_email@example.com]
+Ce fichier configure Shadcn UI.
 
-Les contributions au projet sont les bienvenues !  Veuillez consulter le fichier `CONTRIBUTING.md` pour les lignes directrices.
+```json
+{
+  "ui": {
+    "style": "new-york",
+    "rsc": true,
+    "tsx": true,
+    "tailwind": {
+      "configPath": "tailwind.config.ts",
+      "cssPath": "globals.css"
+    },
+    "aliases": {
+      "@/components": "src/components"
+    },
+    "icons": {
+      "library": "lucide"
+    }
+  }
+}
+```
 
 
-**Note importante:**  Ce document est un exemple et doit être complété avec des détails spécifiques au projet Conotion.  Les sections concernant les API, le dépannage, les optimisations de performance, et les tests doivent être étoffées avec des informations précises.  L'ajout de captures d'écran et d'exemples plus concrets améliorerait grandement la lisibilité et l'utilité de ce document.
+## 6. Documentation de l'API (GraphQL)
+
+L'API GraphQL est accessible à l'adresse `https://zone01normandie.org/api/graphql-engine/v1/graphql`.  Le fichier `apiService.ts` contient les fonctions pour interagir avec l'API.
+
+**Exemple de requête:**
+
+```graphql
+query getUserData {
+  user {
+    login
+    firstName
+    lastName
+    xp
+    level
+  }
+}
+```
+
+[Documentation GraphQL](https://graphql.org/learn/)
+
+
+## 7. Cas d'utilisation courants
+
+* **Authentification:**  L'application gère l'authentification via cookies.  Le service `authService.ts` gère la connexion et la déconnexion.
+* **Accès aux données utilisateur:** Le contexte `userContext.tsx` fournit les données utilisateur aux composants.
+* **Affichage du tableau de bord:** Le composant `src/app/page.tsx` affiche le tableau de bord principal.
+
+
+## 8. Guide de dépannage
+
+* **Erreur de connexion:** Vérifiez vos informations d'identification.
+* **Problèmes de chargement:**  Vérifiez votre connexion internet.
+
+
+## 9. Considérations de sécurité
+
+* **Authentification sécurisée:** L'authentification est gérée via des cookies sécurisés.
+* **Protection contre les injections SQL:** La validation des entrées est effectuée pour éviter les injections SQL.
+* **Protection contre les failles XSS:**  L'application est protégée contre les attaques XSS.
+
+
+## 10. Optimisations de performance
+
+* **Caching:**  Implémentation du caching pour améliorer les performances.
+* **Optimisation des images:**  Les images sont optimisées pour réduire la taille des fichiers.
+* **Code splitting:**  Le code est divisé en plusieurs morceaux pour améliorer les temps de chargement.
+
+
+## 11. Lignes directrices pour les tests
+
+* **Tests unitaires:**  Les tests unitaires doivent être écrits pour chaque composant et fonction.
+* **Tests d'intégration:**  Les tests d'intégration doivent être écrits pour vérifier l'interaction entre les composants.
+* **Tests d'extrémité à extrémité (E2E):** Des tests E2E sont recommandés pour valider le fonctionnement global de l'application.
+
+
+## 12. Processus de déploiement
+
+Le déploiement se fait sur Vercel.  Les instructions sont disponibles dans le fichier `README.md`.
+
+
+## 13. Procédures de maintenance
+
+* **Mises à jour régulières:**  Mettre à jour régulièrement les dépendances et les bibliothèques.
+* **Surveillance:**  Surveiller les performances de l'application et les logs d'erreur.
+* **Sauvegardes:**  Effectuer des sauvegardes régulières de la base de données.
+
+
+## 14. Informations de contact et contributions
+
+Pour toute question ou contribution, contactez [votre_email@exemple.com].  Les contributions sont les bienvenues via des pull requests sur le dépôt GitHub.
+
+
+<br>
+
+**Note importante:**  Cette documentation est un exemple et doit être complétée avec des informations spécifiques à votre projet.  N'oubliez pas de mettre à jour les liens, les exemples de code et les sections pertinentes en fonction de votre application.  L'utilisation de CSS variables est omniprésente dans le code.  Il est crucial de bien documenter ces variables et leurs valeurs pour la maintenance et la compréhension du projet.  De plus,  la complexité de la structure des données (ex: `user?.user[0]?.attrs?.firstName`) suggère une opportunité d'amélioration en refactorisant certains aspects du code pour une meilleure lisibilité et maintenabilité.
