@@ -15,9 +15,6 @@ import { BiSolidFilePng } from "react-icons/bi";
 type FileIconMap = Record<string, { icon: JSX.Element; color: string }>;
 
 export const fileIConWithExtension: FileIconMap = {
-    go: { icon: <FaGolang />, color: "text-cyan-500" },
-    js: { icon: <RiJavascriptFill />, color: "text-yellow-500" },
-    ts: { icon: <SiTypescript />, color: "text-blue-600" },
     py: { icon: <FaPython />, color: "text-green-500" },
     java: { icon: <FaJava />, color: "text-red-500" },
     php: { icon: <FaPhp />, color: "text-purple-600" },
