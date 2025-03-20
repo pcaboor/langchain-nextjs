@@ -1,1 +1,0 @@
-const bebou = "je taime"
